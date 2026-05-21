@@ -16,11 +16,12 @@ def register ():
     if not data:
         return error_response ("Request body must be a JSON", 400)
 
-    if User.query.filter_by (email=data['email'].lower()).first():
-        return error_response ("Email already registered", 409)
-    
     if not data.get('name') or not data.get ('email') or not data.get('password'):
         return error_response ("Name, email and password are required", 422)
+    
+    if User.query.filter_by (email=data['email'].lower()).first():
+        return error_response ("Email already registered", 409)
+
 
     password = data['password']
     hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt ())
