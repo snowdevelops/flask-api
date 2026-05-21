@@ -11,6 +11,8 @@ class User (db.Model):
     phone = db.Column(db.String(20), nullable = True)
     zip_code = db.Column(db.String(20), nullable = True)
     is_active = db.Column(db.Boolean, server_default = '1', nullable = False)
+    password = db.Column(db.String(255), nullable = False)
+    
     def to_dict(self):
         return {
             "id": self.id,
@@ -25,6 +27,7 @@ class Posts (db.Model):
     title = db.Column(db.String(200), nullable = False)
     body = db.Column (db.Text, nullable = False)
     user_id = db.Column (db.Integer, db.ForeignKey('users.id'), nullable = False)
+
 
     def to_dict(self):
         return {

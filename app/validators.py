@@ -31,8 +31,7 @@ def validate_post (data, partial = False):
             errors.append ("Title must be 200 charcaters or fewer")
     
     
-    elif len(str(data['title'].strip())) > 200:
-        errors.append ("Post must be 200 characters or fewer")
+
     if not partial or 'body' in data:
         if 'body' not in data or not str (data.get('body', '')):
             errors.append ("Body must not be empty")

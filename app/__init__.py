@@ -1,5 +1,5 @@
 from flask import Flask,jsonify
-from .extensions import db, migrate
+from .extensions import db, migrate, jwt
 from .routes import register_routes
 
 def create_app():
@@ -8,10 +8,13 @@ def create_app():
     import os
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
         'DATABASE_URL',
-        'mysql+pymysql://flaskuser:1234@localhost/flaskdb'
+        
     )
 
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
+    jwt.init_app(app)
 
     db.init_app(app)
 
