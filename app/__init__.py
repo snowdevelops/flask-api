@@ -1,23 +1,21 @@
 from flask import Flask,jsonify
 from .extensions import db, migrate, jwt
 from .routes import register_routes
+from dotenv import load_dotenv
+import os
+
+load_dotenv ()
 
 def create_app():
     app = Flask(__name__)
 
     import os
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
-        'DATABASE_URL',
-        
-    )
-
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv ('DATABASE_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
+    
     jwt.init_app(app)
-
-    db.init_app(app)
-
+    db.init_app(app)    
     migrate.init_app(app, db)
 
     register_routes(app)

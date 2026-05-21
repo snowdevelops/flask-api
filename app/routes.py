@@ -16,6 +16,8 @@ from .services import (
 )
 from .validators import validate_user, validate_post
 from .response import success_response, error_response
+from .auth import auth_bp
+
 users_bp = Blueprint ('users', __name__, url_prefix='/users')
 posts_bp = Blueprint ('posts',__name__ , url_prefix ='/posts')
 
@@ -159,3 +161,4 @@ def delete_post(post_id):
 def register_routes(app):
     app.register_blueprint(users_bp)
     app.register_blueprint(posts_bp)
+    app.register_blueprint(auth_bp)
