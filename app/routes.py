@@ -17,11 +17,13 @@ from .services import (
 from .validators import validate_user, validate_post
 from .response import success_response, error_response
 from .auth import auth_bp
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 users_bp = Blueprint ('users', __name__, url_prefix='/users')
 posts_bp = Blueprint ('posts',__name__ , url_prefix ='/posts')
 
 @users_bp.route('', methods = ['GET'])
+@jwt_required()
 def get_users():
 
     page=request.args.get('page', 1, type=int)
@@ -43,6 +45,8 @@ def get_users():
     )
 
 @posts_bp.route ('', methods = ['GET'])
+@jwt_required()
+
 def get_posts():
     post = request.args.get('post', 1, type = int)   
     title = request.args.get ('title')
@@ -92,6 +96,8 @@ def create_post():
     return success_response(post.to_dict(), status =201)
 
 @users_bp.route('/<int:user_id>', methods = ['GET'])
+@jwt_required()
+
 def get_user_by_id(user_id):
     user = get_user_by_id_service(user_id)
     if not user:
@@ -99,6 +105,8 @@ def get_user_by_id(user_id):
     return success_response (user.to_dict())
 
 @posts_bp.route ('/<int:post_id>', methods = ['GET'])
+@jwt_required()
+
 def get_post_by_id(post_id):
     post = get_post_by_id_service(post_id)
     if not post:
@@ -106,6 +114,8 @@ def get_post_by_id(post_id):
     return success_response (post.to_dict())
 
 @users_bp.route('/<int:user_id>', methods = ['PUT'])
+@jwt_required()
+
 def update_user(user_id):
     data = request.get_json()
     if not data:
@@ -121,6 +131,7 @@ def update_user(user_id):
     return success_response (user.to_dict())
     
 @posts_bp.route ('/<int:post_id>', methods = ['PUT'])
+@jwt_required()
 
 def update_post(post_id):
     data = request.get_json()
@@ -135,8 +146,11 @@ def update_post(post_id):
     if not post:
         return error_response ("Post not found", 404)
     return success_response (post.to_dict())
-    
+
+
+
 @users_bp.route ('/<int:user_id>', methods = ['DELETE'])
+@jwt_required()
 def delete_user(user_id):
     user = delete_user_service (user_id)
     if not user:
@@ -149,6 +163,7 @@ def delete_user(user_id):
 
 
 @posts_bp.route ('/<int:post_id>', methods = ['DELETE'])
+@jwt_required()
 def delete_post(post_id):
     post = delete_post_service (post_id)
     if not post:
