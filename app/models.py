@@ -10,7 +10,7 @@ class User (db.Model):
     age = db.Column(db.Integer, nullable = False)
     phone = db.Column(db.String(20), nullable = True)
     zip_code = db.Column(db.String(20), nullable = True)
-    is_active = db.Column(db.Boolean, server_default = '1', nullable = False)
+    is_active = db.Column(db.Boolean, default = True, nullable = False)
     password = db.Column(db.String(255), nullable = False)
     
     def to_dict(self):
