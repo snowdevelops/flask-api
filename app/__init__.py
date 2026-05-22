@@ -7,13 +7,16 @@ import os
 
 load_dotenv ()
 
-def create_app():
+def create_app(test_config=None):
     app = Flask(__name__)
 
     import os
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv ('DATABASE_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
+
+    if test_config:
+        app.config.update(test_config)
     
     jwt.init_app(app)
     db.init_app(app)    
