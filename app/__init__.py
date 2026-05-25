@@ -4,6 +4,7 @@ from .routes import register_routes
 from dotenv import load_dotenv
 from .response import error_response
 import os
+from sqlalchemy.exc import SQLAlchemyError
 
 load_dotenv ()
 
@@ -24,6 +25,10 @@ def create_app(test_config=None):
 
     register_routes(app)
 
+    @app.errorhandler(SQLAlchemyError)
+    def handle_db_error(e):
+        return jsonify ({"success": False, "error": "A database error occured", "data": None}), 500
+
     @app.errorhandler(404)
     def not_found(e):
         return jsonify ({"success": False, "error": "Route not found", "data": None}), 404
@@ -37,7 +42,7 @@ def create_app(test_config=None):
         return jsonify ({"success": False, "error": "Method not allowed", "data": None}), 405
     
     @jwt.invalid_token_loader
-    def invalid_token(callback, error):
+    def invalid_token(error):
         return error_response ("Invalid token", 401)
     
     
