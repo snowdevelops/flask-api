@@ -1,7 +1,6 @@
 import math
 from flask import Blueprint, request
 from .services import (
-    create_user_service,
     get_user_by_id_service,
     update_user_service,
     delete_user_service,
@@ -46,41 +45,20 @@ def get_users():
 
 @posts_bp.route ('', methods = ['GET'])
 @jwt_required()
-
 def get_posts():
-    post = request.args.get('post', 1, type = int)   
-    title = request.args.get ('title')
-    body = request.args.get ('body')
-    user_id =request.args.get ('user_id', 1, type = int) 
+    title = request.args.get('title')
+    user_id = request.args.get('user_id', type=int)
 
-    posts = get_all_posts_service()
+    posts = get_all_posts_service(title=title, user_id=user_id)
 
     return success_response(
-        data = [u.to_dict() for u in posts],
-        meta = {
-            "post": post,
+        data=[u.to_dict() for u in posts],
+        meta={
             "title": title,
-            "body": body,
             "user_id": user_id,
         }
     )
 
-
-@users_bp.route('', methods = ['POST'])
-
-
-def create_user():
-    data = request.get_json()
-
-    if not data:
-        return error_response("Request body must be a JSON", 400)
-    errors = validate_user(data)
-    if errors:
-        return error_response (errors, 422)
-
-    from .models import User
-    user = create_user_service(data)
-    return success_response(user.to_dict(), status =201)
 
 @posts_bp.route('', methods = ['POST'])
 def create_post():

@@ -38,22 +38,27 @@ def create_post_service(data):
 def get_all_users_service():
     return User.query.all()
 
-def get_all_posts_service():
-    return Posts.query.all()
+def get_all_posts_service(title=None, user_id=None):
+    query = Posts.query
+    if title:
+        query = query.filter(Posts.title.ilike(f"%{title}%"))
+    if user_id:
+        query = query.filter(Posts.user_id == user_id)
+    return query.all()
 
 #READ (BY ID)
 
 def get_user_by_id_service(user_id):
-    return User.query.get(user_id)
+    return db.session.get(User, user_id)
 
 def get_post_by_id_service(post_id):
-    return Posts.query.get(post_id)
+    return db.session.get(Posts, post_id)
 
 #UPDATE 
 
 def update_user_service (user_id,data):
     try:
-        user = User.query.get(user_id)
+        user = db.session.get(User, user_id)
 
         if not user:
             return None
@@ -71,7 +76,7 @@ def update_user_service (user_id,data):
 
 def update_post_service (post_id,data):
     try:
-        post = Posts.query.get(post_id)
+        post = db.session.get(Posts, post_id)
         if not post:
             return None
         post.title = data.get ('title', post.title).strip()
@@ -89,7 +94,7 @@ def update_post_service (post_id,data):
 
 def delete_user_service (user_id):
     try:
-        user = User.query.get(user_id)
+        user = db.session.get(User, user_id)
         if not user:
             return None
     
@@ -103,7 +108,7 @@ def delete_user_service (user_id):
 
 def delete_post_service (post_id):
     try:
-        post = Posts.query.get(post_id)
+        post = db.session.get(Posts, post_id)
         if not post:
             return None
         db.session.delete(post)

@@ -1,9 +1,10 @@
 def validate_user (data, partial = False):
     errors = []
-    if 'name' not in data or not str(data.get('name', '')).strip():
-        errors.append ("Name is required and cannot be blank")
-    elif len(str(data['name']).strip()) > 100:
-        errors.append ("Name must be 100 characters or fewer")
+    if not partial or 'name' in data:
+        if 'name' not in data or not str(data.get('name', '')).strip():
+            errors.append ("Name is required and cannot be blank")
+        elif len(str(data['name']).strip()) > 100:
+            errors.append ("Name must be 100 characters or fewer")
 
     if not partial or 'email' in data:
         email = data.get('email', '')
