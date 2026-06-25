@@ -93,15 +93,18 @@ def get_post_by_id(post_id):
 
 @users_bp.route('/<int:user_id>', methods = ['PUT'])
 @jwt_required()
-
 def update_user(user_id):
+    current_user_id = int(get_jwt_identity())
+    if current_user_id != user_id:
+        return error_response("You can only update your own account", 403)
+
     data = request.get_json()
     if not data:
         return error_response ("Request body must be JSON", 400)
     errors = validate_user (data, partial=True)
     if errors:
         return error_response (errors, 422)
-    
+
     user = update_user_service (user_id, data)
 
     if not user:
@@ -110,19 +113,22 @@ def update_user(user_id):
     
 @posts_bp.route ('/<int:post_id>', methods = ['PUT'])
 @jwt_required()
-
 def update_post(post_id):
+    current_user_id = int(get_jwt_identity())
+    post = get_post_by_id_service(post_id)
+    if not post:
+        return error_response ("Post not found", 404)
+    if post.user_id != current_user_id:
+        return error_response ("You can only update your own posts", 403)
+
     data = request.get_json()
     if not data:
         return error_response ("Request body must be a JSON", 400)
     errors = validate_post (data, partial = True)
     if errors:
         return error_response (errors, 422)
-    
-    post = update_post_service(post_id, data)
 
-    if not post:
-        return error_response ("Post not found", 404)
+    post = update_post_service(post_id, data)
     return success_response (post.to_dict())
 
 
@@ -130,10 +136,14 @@ def update_post(post_id):
 @users_bp.route ('/<int:user_id>', methods = ['DELETE'])
 @jwt_required()
 def delete_user(user_id):
+    current_user_id = int(get_jwt_identity())
+    if current_user_id != user_id:
+        return error_response("You can only delete your own account", 403)
+
     user = delete_user_service (user_id)
     if not user:
-        return error_response ("User not found", 400)
-    
+        return error_response ("User not found", 404)
+
     return success_response ({
         "message": "User deleted successfully",
         "deleted": user.to_dict()
@@ -143,13 +153,18 @@ def delete_user(user_id):
 @posts_bp.route ('/<int:post_id>', methods = ['DELETE'])
 @jwt_required()
 def delete_post(post_id):
-    post = delete_post_service (post_id)
+    current_user_id = int(get_jwt_identity())
+    post = get_post_by_id_service(post_id)
     if not post:
         return error_response ("Post not found", 404)
-    
+    if post.user_id != current_user_id:
+        return error_response ("You can only delete your own posts", 403)
+
+    deleted_data = post.to_dict()
+    delete_post_service (post_id)
     return success_response ({
         "message": "Post deleted successfully",
-        "deleted": post.to_dict()
+        "deleted": deleted_data
     })
 def register_routes(app):
     app.register_blueprint(users_bp)
